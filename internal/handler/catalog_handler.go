@@ -66,10 +66,6 @@ func DecodeGetCatalogRequest(_ context.Context, r *http.Request) (interface{}, e
 	commerce := r.Header.Get("X-Commerce")
 	trxID := r.Header.Get("X-Transaction-ID")
 
-	if channel == "" || commerce == "" || trxID == "" {
-		return nil, ErrMissingHeaders
-	}
-
 	// Assuming Go 1.22+ for r.PathValue
 	catalogName := r.PathValue("catalog")
 	if catalogName == "" {
