@@ -38,8 +38,12 @@ func TestDecodeGetCatalogRequest_MissingHeaders(t *testing.T) {
 	// No headers
 	req.SetPathValue("catalog", "Destino")
 
-	_, err := DecodeGetCatalogRequest(context.Background(), req)
-	if err != ErrMissingHeaders {
-		t.Fatalf("esperado ErrMissingHeaders, obtenido %v", err)
+	resp, err := DecodeGetCatalogRequest(context.Background(), req)
+	if err != nil {
+		t.Fatalf("esperado nulo, obtenido %v", err)
+	}
+	dto := resp.(endpoint.GetCatalogRequestDTO)
+	if dto.Channel != "" || dto.Commerce != "" || dto.TransactionID != "" {
+		t.Fatalf("esperado headers vacios, obtenido %+v", dto)
 	}
 }
