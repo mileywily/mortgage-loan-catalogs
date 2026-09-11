@@ -19,6 +19,7 @@ A continuación, te detallo los requisitos y el estándar corporativo que debes 
 *   Usa **Clean Architecture** (Arquitectura Hexagonal). 
 *   Utiliza el framework **Go-Kit** para aislar el transporte HTTP (`handler`) de las reglas de negocio (`service`).
 *   Aísla todo contacto con APIs externas en una capa de **Actividades (Anti-Corruption Layer)** inyectando el cliente `http.Client` para facilitar el mocking local.
+*   **Observabilidad Nativa:** Utiliza la librería estándar `log/slog` configurada con `slog.NewJSONHandler` para que todos los logs se emitan en formato JSON estructurado, reemplazando así a `logback-json` de Java. Extrae siempre headers transaccionales (Ej. `X-Transaction-ID`) e inyéctalos como llaves nativas en los logs de error/debug.
 
 ### 3. Estrategia de Testing (TDD y QAS)
 *   Crea pruebas unitarias (`go test`) utilizando `httptest.NewServer` para todas las actividades que requieran consumir un servicio externo. No uses librerías de red externas en las pruebas.

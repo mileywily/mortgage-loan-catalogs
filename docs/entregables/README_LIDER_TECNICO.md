@@ -20,3 +20,6 @@ La deuda técnica por falta de tests y automatización quedó resuelta:
 
 ### D. Deuda Técnica Catalogada
 Para garantizar la promesa de "Drop-In Replacement", migramos conscientemente los "ifs/elses" estáticos originales para parseos especiales de catálogos (Seguros, Comunas, TiposDocumentos). Esto evita incidentes en Producción hoy, pero deja la puerta abierta para que el equipo refactorice usando un "Patrón Strategy" en la Iteración 2, una vez la migración primaria estabilice su periodo de hiper-care.
+
+### E. Mejora de Observabilidad y Trazabilidad sin alterar el contrato
+El servicio heredado imprimía JSONs mudos que perdían el contexto del usuario. En la migración, activamos la librería oficial `log/slog` de Go emulando nativamente a Logback, pero con la **ventaja añadida** de que Go sí extrae el `X-Transaction-ID` (y otros headers de Apigee) inyectándolos transversalmente tanto en los logs de Splunk/Datadog como en la invocación final de red, consiguiendo trazabilidad distribuida real.

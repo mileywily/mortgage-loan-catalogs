@@ -19,5 +19,10 @@ Bajo el principio de **Drop-In Replacement**, se violó deliberadamente el princ
 2.  **Case Sensitivity:** Se replicó el matching estricto `== "TiposDocumentos"`. Si un cliente envía el path en minúsculas, cae sistemáticamente al ruteo genérico que recorta los `ids` nativos, emulando la omisión de `String.equals()` de Java.
 3.  **JSON Key Ordering:** Se forzó el orden de llaves del serializador Jackson (Java) mediante el uso de *anonymous structs* en Go para el manejo del error `401 Unauthorized` (Messages Array).
 
-## 4. Oportunidades de Mejora Futura (Siguiente Iteración)
+## 4. Observabilidad y Trazabilidad (JSON Logging)
+Se configuró la librería nativa `log/slog` de Go 1.21+ para emular el comportamiento del appender `logback-json-classic` del legado.
+*   **Logs Estructurados:** Las salidas a STDOUT son diccionarios JSON estrictos listos para su ingesta en Splunk/Datadog.
+*   **Trazabilidad Distribuida:** A diferencia del sistema legado (que ignoraba los headers), este microservicio extrae proactivamente `X-Transaction-ID`, `X-Channel` y `X-Commerce` del cliente, **los inyecta en cada JSON log de DEBUG/ERROR**, y adicionalmente los propaga hacia el sistema central (Apigee) en las cabeceras HTTP de salida.
+
+## 5. Oportunidades de Mejora Futura (Siguiente Iteración)
 Implementar el **Patrón Strategy** (o Registro de Decodificadores) en memoria durante el inicio del servidor, para reemplazar la cadena de sentencias `if/else` por cada nuevo catálogo, logrando finalmente la resolución del Open/Closed Principle.
