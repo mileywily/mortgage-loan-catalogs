@@ -1,0 +1,42 @@
+﻿name: Integración Continua Go (CI)
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Descargar el código
+      uses: actions/checkout@v4
+
+    - name: Configurar Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: "1.23.0" # Coincide con nuestro go.mod
+
+    - name: Instalar Dependencias
+      run: go mod download
+
+    - name: Verificar Formato del Código
+      run: |
+        if [ -n "$(gofmt -l .)" ]; then
+          echo "Los siguientes archivos no tienen el formato correcto de Go:"
+          gofmt -l .
+          echo "Ejecuta 'go fmt ./...' localmente antes de subir."
+          exit 1
+        fi
+
+    - name: Ejecutar Pruebas Unitarias e Integración
+      run: go test -v ./... -coverprofile=coverage.out
+
+    - name: Verificar Compilación del Binario
+      run: go build -v ./cmd/server/main.go
+
+    - name: Validar Build de la Imagen Docker
+      run: docker build -t mortgage-catalogs-go:test .
+

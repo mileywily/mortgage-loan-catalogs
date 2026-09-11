@@ -1,0 +1,61 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mortgage-catalogs-go
+  labels:
+    app: mortgage-catalogs-go
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mortgage-catalogs-go
+  template:
+    metadata:
+      labels:
+        app: mortgage-catalogs-go
+    spec:
+      containers:
+      - name: mortgage-catalogs-go
+        image: gcr.io/tu-proyecto/mortgage-catalogs-go:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PORT
+          value: "8080"
+        - name: USE_REAL_BACKEND
+          value: "true"
+        - name: FINNFLOW_URL
+          valueFrom:
+            configMapKeyRef:
+              name: catalogo-config
+              key: FINNFLOW_URL
+        - name: FINNFLOW_TIMEOUT
+          valueFrom:
+            configMapKeyRef:
+              name: catalogo-config
+              key: FINNFLOW_TIMEOUT
+        - name: FINNFLOW_KEY
+          valueFrom:
+            secretKeyRef:
+              name: catalogo-secrets
+              key: FINNFLOW_KEY
+        - name: FINNFLOW_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: catalogo-secrets
+              key: FINNFLOW_SECRET
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+        readinessProbe:
+          httpGet:
+            path: /docs/ # Temporalmente apuntando al swagger como readiness
+            port: 8080
+          initialDelaySeconds: 2
+          periodSeconds: 10
+

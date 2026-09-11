@@ -1,0 +1,131 @@
+﻿openapi: 3.0.3
+info:
+  title: Mortgage Loan Catalogs API
+  description: Microservicio encargado de la orquestación y obtención de los catálogos de Hipotecario (Drop-In Replacement en Go)
+  version: 1.0.1
+servers:
+  - url: /
+    description: Servidor Local
+paths:
+  /v1/bfcl/mortgage-loan/catalogs/{catalog}:
+    post:
+      summary: Obtener elementos de un catálogo específico
+      description: Retorna la lista de elementos correspondientes al catálogo solicitado. Emula la respuesta exacta del sistema heredado.
+      operationId: getCatalog
+      parameters:
+        - name: catalog
+          in: path
+          required: true
+          description: Nombre del catálogo a consultar
+          schema:
+            type: string
+            enum:
+              - Destino
+              - Objetivo
+              - TiposConstrucciones
+              - TiposInmuebles
+              - Antiguedades
+              - Comunas
+              - Regiones
+              - Producto
+              - GruposDocumentos
+              - TiposDocumentos
+              - TipoParticipante
+              - CampanasHipotecarias
+              - SegurosIncendio
+              - SegurosDesgravamen
+              - SegurosCesantia
+        - name: X-Channel
+          in: header
+          required: true
+          description: Canal de origen de la transacción
+          schema:
+            type: string
+        - name: X-Commerce
+          in: header
+          required: true
+          description: Comercio de origen (Ej. FALABELLA)
+          schema:
+            type: string
+        - name: X-Transaction-ID
+          in: header
+          required: true
+          description: Identificador único de la transacción
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Operación exitosa. Retorna el arreglo de ítems del catálogo.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CatalogItem"
+        "400":
+          description: Error general en la obtención de catálogos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Error de Autenticación o Headers faltantes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "402":
+          description: Catálogo no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    CatalogItem:
+      type: object
+      description: Dependiendo del catálogo solicitado, la estructura devuelta varía. Este schema representa el estándar.
+      properties:
+        codigo_adm:
+          type: string
+          description: Código del ítem (puede ser string o integer dependiendo del catálogo)
+        descripcion:
+          type: string
+          description: Descripción del ítem
+        region_id:
+          type: integer
+          description: Solo presente en el catálogo de Comunas
+        grupo_id:
+          type: integer
+          description: Solo presente en TiposDocumentos
+        codRespuesta:
+          type: integer
+          description: Solo presente cuando no hay resultados (Error de red/vacío)
+        Mensaje:
+          type: string
+          description: Solo presente cuando no hay resultados
+        Excepcion:
+          type: string
+          description: Solo presente cuando no hay resultados
+        IdentificadorSeguro:
+          type: string
+          description: Solo presente en catálogos de Seguros
+    ErrorResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+          nullable: true
+        code:
+          type: string
+          nullable: true
+        messages:
+          type: array
+          nullable: true
+          items:
+            type: object
+        errors_detail:
+          type: string
+          nullable: true
+
