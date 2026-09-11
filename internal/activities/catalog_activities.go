@@ -144,9 +144,9 @@ func (a *LegacyCatalogActivity) FetchLegacyCatalogActivity(ctx context.Context, 
 
 	if req.CatalogName == "Comunas" {
 		var upstreamItems []struct {
-			CodigoAdm   string `json:"codigo_adm"`
-			Descripcion string `json:"descripcion"`
-			RegionID    int    `json:"region_id"`
+			CodigoAdm   interface{} `json:"codigo_adm"`
+			Descripcion string      `json:"descripcion"`
+			RegionID    int         `json:"region_id"`
 		}
 		if err := json.NewDecoder(resp.Body).Decode(&upstreamItems); err != nil {
 			return nil, temporalError("UpstreamDecodeError", err.Error())
@@ -154,7 +154,7 @@ func (a *LegacyCatalogActivity) FetchLegacyCatalogActivity(ctx context.Context, 
 		domainItems := make([]model.ComunaCatalogItem, len(upstreamItems))
 		for i, item := range upstreamItems {
 			domainItems[i] = model.ComunaCatalogItem{
-				Code:        item.CodigoAdm,
+				Code:        fmt.Sprintf("%v", item.CodigoAdm),
 				Description: item.Descripcion,
 				RegionID:    item.RegionID,
 			}
@@ -164,9 +164,9 @@ func (a *LegacyCatalogActivity) FetchLegacyCatalogActivity(ctx context.Context, 
 
 	// Default Standard Catalogs
 	var upstreamItems []struct {
-		CodigoAdm    string `json:"codigo_adm"`
-		Descripcion  string `json:"descripcion"`
-		CodRespuesta *int   `json:"codRespuesta"`
+		CodigoAdm    interface{} `json:"codigo_adm"`
+		Descripcion  string      `json:"descripcion"`
+		CodRespuesta *int        `json:"codRespuesta"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&upstreamItems); err != nil {
 		return nil, temporalError("UpstreamDecodeError", err.Error())
@@ -180,7 +180,7 @@ func (a *LegacyCatalogActivity) FetchLegacyCatalogActivity(ctx context.Context, 
 	domainItems := make([]model.CatalogItem, len(upstreamItems))
 	for i, item := range upstreamItems {
 		domainItems[i] = model.CatalogItem{
-			Code:        item.CodigoAdm,
+			Code:        fmt.Sprintf("%v", item.CodigoAdm),
 			Description: item.Descripcion,
 		}
 	}
