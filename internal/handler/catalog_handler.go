@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/bancofalabella/mortgage-loan-catalogs/internal/endpoint"
@@ -52,11 +53,11 @@ type insuranceCatalogItemDTO struct {
 	CodigoCompania            int     `json:"CodigoCompania"`
 	CodigoTipoSeguro          int     `json:"CodigoTipoSeguro"`
 	CorrelativoPoliza         int     `json:"CorrelativoPoliza"`
-	Tasa                      float64 `json:"Tasa"`
-	Factor                    float64 `json:"Factor"`
-	IndicadorPolizaIndividual int     `json:"IndicadorPolizaIndividual"`
-	PorValorCuota             int     `json:"PorValorCuota"`
-	IndicadorPolizaExterna    int     `json:"IndicadorPolizaExterna"`
+	Tasa                      json.Number `json:"Tasa"`
+	Factor                    json.Number `json:"Factor"`
+	IndicadorPolizaIndividual int         `json:"IndicadorPolizaIndividual"`
+	PorValorCuota             int         `json:"PorValorCuota"`
+	IndicadorPolizaExterna    int         `json:"IndicadorPolizaExterna"`
 }
 
 // DecodeGetCatalogRequest extracts and validates the headers and path variables
@@ -142,8 +143,8 @@ func EncodeResponse(ctx context.Context, w http.ResponseWriter, response interfa
 					CodigoCompania:            item.CompanyCode,
 					CodigoTipoSeguro:          item.InsuranceTypeCode,
 					CorrelativoPoliza:         item.PolicyCorrelative,
-					Tasa:                      item.Rate,
-					Factor:                    item.Factor,
+					Tasa:                      json.Number(formatFloatLikeJackson(item.Rate)),
+					Factor:                    json.Number(formatFloatLikeJackson(item.Factor)),
 					IndicadorPolizaIndividual: item.IndividualPolicyFlag,
 					PorValorCuota:             item.PerQuotaValueFlag,
 					IndicadorPolizaExterna:    item.ExternalPolicyFlag,
@@ -220,4 +221,20 @@ func EncodeError(_ context.Context, err error, w http.ResponseWriter) {
 		Messages:     nil,
 		ErrorsDetail: &errMessage,
 	})
+}
+
+// formatFloatLikeJackson formats a float64 precisely as Java's Jackson/Double.toString() does:
+// Switching to scientific notation for |d| < 10^-3 or |d| >= 10^7, removing the leading 0 in the exponent.
+func formatFloatLikeJackson(f float64) string {
+	// Let Go do standard generic formatting first
+	s := strconv.FormatFloat(f, 'g', -1, 64)
+
+	// Java Double.toString() forces exponential if value < 1e-3
+	if f != 0 && f > -1e-3 && f < 1e-3 {
+		s = strconv.FormatFloat(f, 'E', -1, 64)
+		// Go returns 2.255E-04, Java returns 2.255E-4
+		s = strings.Replace(s, "E-0", "E-", 1)
+		s = strings.Replace(s, "E+0", "E", 1)
+	}
+	return s
 }
