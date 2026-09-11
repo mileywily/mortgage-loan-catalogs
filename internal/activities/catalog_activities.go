@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"strings"
 
@@ -15,7 +16,7 @@ type LegacyCatalogClient interface {
 	FetchLegacyCatalogActivity(ctx context.Context, req model.GetCatalogRequest) (interface{}, error)
 }
 
-// LegacyCatalogActivity implements the Legacy upstream HTTP calls.
+// LegacyCatalogActivity handles API interaction with legacy Apigee/Finnflow systems
 type LegacyCatalogActivity struct {
 	apigeeBaseURL string
 	username      string
@@ -23,13 +24,13 @@ type LegacyCatalogActivity struct {
 	httpClient    *http.Client
 }
 
-// NewLegacyCatalogActivity creates a new instance of the legacy HTTP caller.
-func NewLegacyCatalogActivity(apigeeBaseURL, username, password string, httpClient *http.Client) *LegacyCatalogActivity {
+// NewLegacyCatalogActivity creates a new instance of LegacyCatalogActivity
+func NewLegacyCatalogActivity(baseURL, user, pass string, client *http.Client) *LegacyCatalogActivity {
 	return &LegacyCatalogActivity{
-		apigeeBaseURL: apigeeBaseURL,
-		username:      username,
-		password:      password,
-		httpClient:    httpClient,
+		apigeeBaseURL: baseURL,
+		username:      user,
+		password:      pass,
+		httpClient:    client,
 	}
 }
 
@@ -37,6 +38,8 @@ func NewLegacyCatalogActivity(apigeeBaseURL, username, password string, httpClie
 // and mapping them to domain errors expected by the Temporal Workflow.
 func (a *LegacyCatalogActivity) FetchLegacyCatalogActivity(ctx context.Context, req model.GetCatalogRequest) (interface{}, error) {
 	url := fmt.Sprintf("%s/api/catalogo_detail/%s", a.apigeeBaseURL, req.CatalogName)
+
+	slog.Debug("Calling external API", "url", url, "catalog", req.CatalogName, "transactionId", req.TransactionID)
 
 	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, url, nil)
 	if err != nil {
@@ -55,6 +58,7 @@ func (a *LegacyCatalogActivity) FetchLegacyCatalogActivity(ctx context.Context, 
 	if err != nil {
 		errStr := err.Error()
 		if strings.Contains(errStr, "timeout") || strings.Contains(errStr, "connection") || strings.Contains(errStr, "deadline") {
+			slog.Error("Network error calling external API", "catalog", req.CatalogName, "error", errStr)
 			return []model.NoResultsCatalogItem{{CodRespuesta: 3, Mensaje: "Sin resultados.", Excepcion: "Ninguna"}}, nil
 		}
 		return nil, err
@@ -62,6 +66,7 @@ func (a *LegacyCatalogActivity) FetchLegacyCatalogActivity(ctx context.Context, 
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
+		slog.Error("HTTP error calling external API", "catalog", req.CatalogName, "status", resp.StatusCode)
 		switch resp.StatusCode {
 		case http.StatusBadRequest:
 			return nil, temporalError("InvalidCatalogError", fmt.Sprintf("invalid catalog request: %d", resp.StatusCode))

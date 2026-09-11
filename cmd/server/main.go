@@ -3,8 +3,7 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"time"
@@ -104,6 +103,19 @@ func (s *localTestService) GetCatalog(ctx context.Context, req model.GetCatalogR
 }
 
 func main() {
+	// Configure JSON logger replacing logback-json-classic
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level: slog.LevelDebug,
+		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+			// Optional: Match logback exactly by renaming "msg" to "message"
+			if a.Key == slog.MessageKey {
+				a.Key = "message"
+			}
+			return a
+		},
+	}))
+	slog.SetDefault(logger)
+
 	var svc service.CatalogService
 
 	if os.Getenv("USE_REAL_BACKEND") == "true" {
@@ -128,11 +140,11 @@ func main() {
 
 		activity := activities.NewLegacyCatalogActivity(finnflowURL, finnflowKey, finnflowSecret, httpClient)
 		svc = &localTestService{activity: activity}
-		fmt.Printf("Starting in PARITY TEST MODE (Connecting to %s)\n", finnflowURL)
+		slog.Info("Starting application", "mode", "PARITY TEST MODE", "finnflow_url", finnflowURL)
 	} else {
 		// 1. Inicializar el Servicio Dummy (sin Temporal para pruebas locales rÃ¡pidas)
 		svc = &dummyService{}
-		fmt.Println("Starting in DUMMY MODE")
+		slog.Info("Starting application", "mode", "DUMMY MODE")
 	}
 
 	// 2. Crear el Endpoint
@@ -166,6 +178,9 @@ func main() {
 		}
 	}
 
-	fmt.Printf("Servidor Mock iniciado en puerto %s. Listo para pruebas en Postman...\n", port)
-	log.Fatal(http.ListenAndServe(":"+port, mux))
+	slog.Info("Server listening", "port", port)
+	if err := http.ListenAndServe(":"+port, mux); err != nil {
+		slog.Error("Server failed", "error", err)
+		os.Exit(1)
+	}
 }
