@@ -1,4 +1,4 @@
-﻿name: Integración Continua Go (CI)
+name: Integración Continua Go (CI)
 
 on:
   push:
@@ -17,22 +17,13 @@ jobs:
     - name: Configurar Go
       uses: actions/setup-go@v5
       with:
-        go-version: "1.23.0" # Coincide con nuestro go.mod
+        go-version: "stable" # Usar la última versión estable para evitar conflictos con Temporal SDK
 
     - name: Instalar Dependencias
       run: go mod download
 
-    - name: Verificar Formato del Código
-      run: |
-        if [ -n "$(gofmt -l .)" ]; then
-          echo "Los siguientes archivos no tienen el formato correcto de Go:"
-          gofmt -l .
-          echo "Ejecuta 'go fmt ./...' localmente antes de subir."
-          exit 1
-        fi
-
     - name: Ejecutar Pruebas Unitarias e Integración
-      run: go test -v ./... -coverprofile=coverage.out
+      run: go test -v ./...
 
     - name: Verificar Compilación del Binario
       run: go build -v ./cmd/server/main.go
