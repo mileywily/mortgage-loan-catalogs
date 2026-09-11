@@ -1,5 +1,14 @@
+# =====================================================================
 # Script Extendido de Comparación de Paridad Java (8080) vs Go (8082)
-
+# =====================================================================
+# REQUISITOS PARA EJECUTAR ESTE SCRIPT:
+# 1. No necesitas tener "Go" instalado si usas los archivos ejecutables (.exe).
+#    (Solo necesitas Windows PowerShell, que viene preinstalado).
+# 2. Debes tener los servidores encendidos ANTES de ejecutar este script:
+#    - Servidor Java (Legacy) encendido en el puerto 8080 (Opcional, si solo quieres probar Go, fallará Java pero Go funcionará).
+#    - Simulador Mock encendido en el puerto 9090.
+#    - Servidor Go (API) encendido en el puerto 8082 apuntando al puerto 9090.
+# =====================================================================
 $javaUrl = "http://localhost:8080/v1/bfcl/mortgage-loan/catalogs"
 $goUrl   = "http://localhost:8082/v1/bfcl/mortgage-loan/catalogs"
 

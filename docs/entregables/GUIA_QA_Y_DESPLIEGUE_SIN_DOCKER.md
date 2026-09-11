@@ -21,6 +21,7 @@ Configuren las siguientes variables de entorno en su servidor apuntando a las cr
 | `FINNFLOW_URL` | URL base del Finnflow de Pruebas | `https://apigee-qa.bancofalabella.cl` |
 | `FINNFLOW_KEY` | Usuario de QA para Finnflow | `usuario_qa` |
 | `FINNFLOW_SECRET` | Password de QA para Finnflow | `password_qa` |
+| `FINNFLOW_INSECURE_SKIP_VERIFY` | Ignorar errores de certificados SSL (Típico en QA) | `true` |
 
 ### 1.3 Ejecutar el Servicio
 Simplemente enciendan el binario en la terminal del servidor:
@@ -48,27 +49,35 @@ go test -coverprofile=coverage.out ./...
 go tool cover -html=coverage.out
 ```
 
-### 2.3 Pruebas End-to-End (E2E) de Paridad Estricta
-Para certificar que Go responde **exactamente** igual que el sistema legado (incluyendo manejo de minúsculas, mayúsculas, errores 401 y caídas de red), el equipo debe usar el simulador de red incluido (`mock_backend`).
+### 2.3 Pruebas End-to-End (E2E) de Paridad Estricta (Usando Ejecutables .exe)
+Para certificar que Go responde **exactamente** igual que el sistema legado (incluyendo manejo de minúsculas, mayúsculas, errores 401 y caídas de red), el equipo debe usar el simulador de red incluido (`mock_backend`). **No se requiere instalar Go ni Docker.**
 
-**Paso A: Iniciar el Simulador Finnflow (Terminal 1)**
-```bash
-go run ./cmd/mock_backend/main.go
+**Paso A: Preparación (A cargo del desarrollador)**
+El desarrollador debe compilar los dos ejecutables en su máquina y entregarlos al equipo de QA en una carpeta junto con el script de pruebas:
+```powershell
+go build -o api-catalogos.exe ./cmd/server/main.go
+go build -o simulador-finnflow.exe ./cmd/mock_backend/main.go
+```
+
+**Paso B: Iniciar el Simulador Finnflow (QA - Terminal 1)**
+Abran una consola PowerShell en la carpeta donde guardaron los archivos y ejecuten el simulador:
+```powershell
+.\simulador-finnflow.exe
 # El simulador quedará escuchando en el puerto 9090
 ```
 
-**Paso B: Iniciar el Microservicio Go (Terminal 2)**
-Apuntando al simulador:
+**Paso C: Iniciar el Microservicio Go (QA - Terminal 2)**
+Abran una segunda consola PowerShell, inyecten las variables para que mire al simulador local, y enciendan el API:
 ```powershell
 $env:PORT="8082"
 $env:USE_REAL_BACKEND="true"
 $env:FINNFLOW_URL="http://localhost:9090"
-go run ./cmd/server/main.go
+.\api-catalogos.exe
 ```
 
-**Paso C: Ejecutar el Script de Certificación (Terminal 3)**
-Con ambos servidores encendidos, ejecuten el script de pruebas de estrés y paridad:
+**Paso D: Ejecutar el Script de Certificación (QA - Terminal 3)**
+Con ambos servidores encendidos, abran una tercera consola y ejecuten el script de pruebas de estrés y paridad. Si Windows bloquea la ejecución por políticas de seguridad, utilicen este comando explícito:
 ```powershell
-.\test_paridad_extendido.ps1
+powershell -ExecutionPolicy Bypass -File .\test_paridad_extendido.ps1
 ```
-El script ejecutará 13 llamados HTTP distintos, validando que el servidor entregue los Status Codes correctos y la estructura JSON idéntica a la documentación corporativa heredada.
+El script de PowerShell disparará 13 peticiones HTTP distintas hacia el archivo `.exe`, validando que el servidor de Go atrape los timeouts del simulador y devuelva la estructura JSON idéntica a la documentación corporativa heredada.

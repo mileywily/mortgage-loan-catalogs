@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"log/slog"
 	"net/http"
 	"os"
 	"time"
 
+	"github.com/bancofalabella/mortgage-loan-catalogs/docs"
 	"github.com/bancofalabella/mortgage-loan-catalogs/internal/activities"
 	"github.com/bancofalabella/mortgage-loan-catalogs/internal/endpoint"
 	"github.com/bancofalabella/mortgage-loan-catalogs/internal/handler"
@@ -126,6 +128,7 @@ func main() {
 		finnflowKey := os.Getenv("FINNFLOW_KEY")
 		finnflowSecret := os.Getenv("FINNFLOW_SECRET")
 		finnflowTimeout := os.Getenv("FINNFLOW_TIMEOUT")
+		insecureSkipVerify := os.Getenv("FINNFLOW_INSECURE_SKIP_VERIFY") == "true"
 
 		timeoutDuration := 30 * time.Second
 		if finnflowTimeout != "" {
@@ -134,8 +137,15 @@ func main() {
 			}
 		}
 
+		tr := &http.Transport{}
+		if insecureSkipVerify {
+			tr.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+			slog.Warn("TLS Certificate verification is DISABLED (InsecureSkipVerify). Do not use in production.")
+		}
+
 		httpClient := &http.Client{
-			Timeout: timeoutDuration,
+			Timeout:   timeoutDuration,
+			Transport: tr,
 		}
 
 		activity := activities.NewLegacyCatalogActivity(finnflowURL, finnflowKey, finnflowSecret, httpClient)
@@ -167,8 +177,8 @@ func main() {
 	// 4. Configurar el Mux (Enrutador)
 	mux.Handle("POST /v1/bfcl/mortgage-loan/catalogs/{catalog}", httpHandler)
 
-	// Servir Swagger UI y OpenAPI spec
-	mux.Handle("/docs/", http.StripPrefix("/docs/", http.FileServer(http.Dir("docs"))))
+	// Servir Swagger UI y OpenAPI spec desde el binario embebido
+	mux.Handle("/docs/", http.StripPrefix("/docs/", http.FileServer(http.FS(docs.FS))))
 
 	port := os.Getenv("PORT")
 	if port == "" {

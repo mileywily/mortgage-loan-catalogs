@@ -26,8 +26,8 @@ go tool cover -html=coverage.out
 El repositorio incluye un script de PowerShell que realiza 13 pruebas automatizadas contra el servidor levantado, asegurando que cumple byte a byte con las reglas de negocio.
 ```powershell
 # Primero, levanta el mock backend y el microservicio localmente (Ver sección 2)
-# Luego, en otra consola, ejecuta la matriz de paridad:
-.\test_paridad_extendido.ps1
+# Luego, en otra consola, ejecuta la matriz de paridad saltando la restricción de Windows:
+powershell -ExecutionPolicy Bypass -File .\test_paridad_extendido.ps1
 ```
 
 ---
