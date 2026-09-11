@@ -9,11 +9,11 @@ import (
 	"os"
 	"time"
 
-	"github.com/bancofalabella/mortgage-catalogs-go/internal/activities"
-	"github.com/bancofalabella/mortgage-catalogs-go/internal/endpoint"
-	"github.com/bancofalabella/mortgage-catalogs-go/internal/handler"
-	"github.com/bancofalabella/mortgage-catalogs-go/internal/model"
-	"github.com/bancofalabella/mortgage-catalogs-go/internal/service"
+	"github.com/bancofalabella/mortgage-loan-catalogs/internal/activities"
+	"github.com/bancofalabella/mortgage-loan-catalogs/internal/endpoint"
+	"github.com/bancofalabella/mortgage-loan-catalogs/internal/handler"
+	"github.com/bancofalabella/mortgage-loan-catalogs/internal/model"
+	"github.com/bancofalabella/mortgage-loan-catalogs/internal/service"
 	httptransport "github.com/go-kit/kit/transport/http"
 )
 
@@ -26,9 +26,9 @@ func (s *dummyService) GetCatalog(ctx context.Context, req model.GetCatalogReque
 		return []model.InsuranceCatalogItem{
 			{
 				InsuranceIdentifier:  "1100438-01-2023-000",
-				Description:          "INCENDIO - Everest compañia de seguros generales Chile(0.2255300)",
+				Description:          "INCENDIO - Everest compaÃ±ia de seguros generales Chile(0.2255300)",
 				Policy:               "100438-01-2023-000",
-				CompanyName:          "Everest compañia de seguros generales Chile",
+				CompanyName:          "Everest compaÃ±ia de seguros generales Chile",
 				CompanyCode:          39,
 				InsuranceTypeCode:    0,
 				PolicyCorrelative:    28,
@@ -130,7 +130,7 @@ func main() {
 		svc = &localTestService{activity: activity}
 		fmt.Printf("Starting in PARITY TEST MODE (Connecting to %s)\n", finnflowURL)
 	} else {
-		// 1. Inicializar el Servicio Dummy (sin Temporal para pruebas locales rápidas)
+		// 1. Inicializar el Servicio Dummy (sin Temporal para pruebas locales rÃ¡pidas)
 		svc = &dummyService{}
 		fmt.Println("Starting in DUMMY MODE")
 	}
@@ -169,3 +169,4 @@ func main() {
 	fmt.Printf("Servidor Mock iniciado en puerto %s. Listo para pruebas en Postman...\n", port)
 	log.Fatal(http.ListenAndServe(":"+port, mux))
 }
+

@@ -1,13 +1,14 @@
 ﻿apiVersion: v1
 kind: Service
 metadata:
-  name: mortgage-catalogs-go
+  name: mortgage-loan-catalogs
 spec:
   selector:
-    app: mortgage-catalogs-go
+    app: mortgage-loan-catalogs
   ports:
     - protocol: TCP
       port: 80
       targetPort: 8080
   type: ClusterIP
+
 

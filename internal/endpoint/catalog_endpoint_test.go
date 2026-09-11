@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/bancofalabella/mortgage-catalogs-go/internal/model"
+	"github.com/bancofalabella/mortgage-loan-catalogs/internal/model"
 )
 
 // MockCatalogService acts as a dummy implementation of the Service Use Case 
@@ -82,3 +82,4 @@ func TestMakeGetCatalogEndpoint_Error(t *testing.T) {
 		t.Errorf("expected error %v, got %v", "CatalogNotFoundError: invalid catalog", err)
 	}
 }
+

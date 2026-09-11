@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/bancofalabella/mortgage-catalogs-go/internal/endpoint"
+	"github.com/bancofalabella/mortgage-loan-catalogs/internal/endpoint"
 )
 
 func TestDecodeGetCatalogRequest_Success(t *testing.T) {
@@ -43,4 +43,5 @@ func TestDecodeGetCatalogRequest_MissingHeaders(t *testing.T) {
 		t.Fatalf("esperado ErrMissingHeaders, obtenido %v", err)
 	}
 }
+
 

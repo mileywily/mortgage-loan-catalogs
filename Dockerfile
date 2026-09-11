@@ -14,7 +14,7 @@ RUN go mod download
 COPY . .
 
 # Build the application statically
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o mortgage-catalogs-go ./cmd/server/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o mortgage-loan-catalogs ./cmd/server/main.go
 
 # Final stage
 FROM alpine:3.19
@@ -22,7 +22,7 @@ FROM alpine:3.19
 WORKDIR /app
 
 # Copy the pre-built binary file from the previous stage
-COPY --from=builder /app/mortgage-catalogs-go .
+COPY --from=builder /app/mortgage-loan-catalogs .
 
 # Copy swagger documentation (if available)
 COPY --from=builder /app/docs ./docs
@@ -31,5 +31,5 @@ COPY --from=builder /app/docs ./docs
 EXPOSE 8080
 
 # Command to run the executable
-CMD ["./mortgage-catalogs-go"]
+CMD ["./mortgage-loan-catalogs"]
 

@@ -1,6 +1,6 @@
-module github.com/bancofalabella/mortgage-catalogs-go
+module github.com/bancofalabella/mortgage-loan-catalogs
 
-go 1.23.0
+go 1.25.4
 
 require (
 	github.com/go-kit/kit v0.13.0

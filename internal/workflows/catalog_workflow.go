@@ -6,7 +6,7 @@ import (
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/workflow"
 
-	"github.com/bancofalabella/mortgage-catalogs-go/internal/model"
+	"github.com/bancofalabella/mortgage-loan-catalogs/internal/model"
 )
 
 // GetCatalogWorkflow orchestrates the retrieval of a catalog
@@ -43,3 +43,4 @@ func GetCatalogWorkflow(ctx workflow.Context, req model.GetCatalogRequest) (inte
 
 	return result, nil
 }
+

@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/bancofalabella/mortgage-catalogs-go/internal/endpoint"
-	"github.com/bancofalabella/mortgage-catalogs-go/internal/model"
+	"github.com/bancofalabella/mortgage-loan-catalogs/internal/endpoint"
+	"github.com/bancofalabella/mortgage-loan-catalogs/internal/model"
 )
 
 var (
@@ -202,7 +202,7 @@ func EncodeError(_ context.Context, err error, w http.ResponseWriter) {
 	// 2. Catalog Not Found -> Match CatalogNotFoundException
 	if strings.Contains(errMessage, "CatalogNotFoundError") || errors.Is(err, ErrInvalidCatalog) {
 		w.WriteHeader(http.StatusPaymentRequired) // 402 Legacy match
-		ed := "Catálogo no encontrado"
+		ed := "CatÃ¡logo no encontrado"
 		json.NewEncoder(w).Encode(errorResponseDTO{
 			Detail:       nil,
 			Code:         nil,
@@ -221,3 +221,4 @@ func EncodeError(_ context.Context, err error, w http.ResponseWriter) {
 		ErrorsDetail: &errMessage,
 	})
 }
+

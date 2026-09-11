@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/bancofalabella/mortgage-catalogs-go/internal/model"
+	"github.com/bancofalabella/mortgage-loan-catalogs/internal/model"
 )
 
 // LegacyCatalogClient defines the Anti-Corruption Layer (ACL) contract.
@@ -188,3 +188,4 @@ func (a *LegacyCatalogActivity) FetchLegacyCatalogActivity(ctx context.Context, 
 func temporalError(errType, message string) error {
 	return fmt.Errorf("%s: %s", errType, message)
 }
+

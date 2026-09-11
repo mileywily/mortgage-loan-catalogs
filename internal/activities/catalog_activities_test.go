@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/bancofalabella/mortgage-catalogs-go/internal/model"
+	"github.com/bancofalabella/mortgage-loan-catalogs/internal/model"
 )
 
 // TestFetchLegacyCatalogActivity_Interoperability_Success uses an httptest.Server
@@ -95,3 +95,4 @@ func TestFetchLegacyCatalogActivity_Interoperability_Errors(t *testing.T) {
 		})
 	}
 }
+

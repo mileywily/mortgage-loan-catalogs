@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"github.com/bancofalabella/mortgage-catalogs-go/internal/model"
+	"github.com/bancofalabella/mortgage-loan-catalogs/internal/model"
 )
 
 // CatalogService defines the pure Use Case interface for Mortgage Catalogs.
@@ -11,3 +11,4 @@ import (
 type CatalogService interface {
 	GetCatalog(ctx context.Context, req model.GetCatalogRequest) (interface{}, error)
 }
+

@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/go-kit/kit/endpoint"
-	"github.com/bancofalabella/mortgage-catalogs-go/internal/model"
-	"github.com/bancofalabella/mortgage-catalogs-go/internal/service"
+	"github.com/bancofalabella/mortgage-loan-catalogs/internal/model"
+	"github.com/bancofalabella/mortgage-loan-catalogs/internal/service"
 )
 
 // GetCatalogRequestDTO is the input for the endpoint layer.
@@ -44,3 +44,4 @@ func MakeGetCatalogEndpoint(s service.CatalogService) endpoint.Endpoint {
 		return GetCatalogResponseDTO{Data: result}, nil
 	}
 }
+
