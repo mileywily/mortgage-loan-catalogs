@@ -79,7 +79,7 @@ func main() {
 		// Fallback para case-insensitivity tests (tiposdocumentos, comunas) u otros
 		w.WriteHeader(http.StatusOK)
 		// Forzar codigo_adm como string para validar descarte de tipos correctos
-		w.Write([]byte(`[{"codigo_adm":"1","descripcion":"Destino Parity"}]`))
+		w.Write([]byte(`[{"codigo_adm":"1","descripcion":"Vivienda Principal"}]`))
 	})
 
 	fmt.Println("Mock BFCL Backend (Upstream) listening on :9090")
