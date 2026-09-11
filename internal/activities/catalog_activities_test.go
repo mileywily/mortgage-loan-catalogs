@@ -15,7 +15,7 @@ import (
 func TestFetchLegacyCatalogActivity_Interoperability_Success(t *testing.T) {
 	// 1. Arrange: Create a local Mock Server for Apigee
 	mockLegacyJSON := `[{"codigo_adm":"1","descripcion":"valor 1"}]`
-	
+
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Validate that the ACL forwards the required headers to the legacy system
 		if r.Header.Get("X-Channel") != "APP" {
@@ -37,7 +37,7 @@ func TestFetchLegacyCatalogActivity_Interoperability_Success(t *testing.T) {
 
 	// Inject the mock server URL as the Apigee Base URL
 	activity := NewLegacyCatalogActivity(server.URL, "", "", server.Client())
-	
+
 	req := model.GetCatalogRequest{
 		CatalogName:   "Comunas",
 		Channel:       "APP",
@@ -77,22 +77,21 @@ func TestFetchLegacyCatalogActivity_Interoperability_Errors(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(tt.legacyStatus)
 			}))
-			
+
 			activity := NewLegacyCatalogActivity(server.URL, "", "", server.Client())
-			
+
 			_, err := activity.FetchLegacyCatalogActivity(context.Background(), model.GetCatalogRequest{CatalogName: "Destino"})
-			
+
 			if err == nil {
 				t.Fatalf("expected error, got nil")
 			}
-			
+
 			// Validate that the error type contains our expected Domain mapped error
 			if !strings.Contains(err.Error(), tt.expectedErrMsg) {
 				t.Errorf("expected error to contain %s, got %v", tt.expectedErrMsg, err)
 			}
-			
+
 			server.Close()
 		})
 	}
 }
-

@@ -37,7 +37,7 @@ func NewLegacyCatalogActivity(apigeeBaseURL, username, password string, httpClie
 // and mapping them to domain errors expected by the Temporal Workflow.
 func (a *LegacyCatalogActivity) FetchLegacyCatalogActivity(ctx context.Context, req model.GetCatalogRequest) (interface{}, error) {
 	url := fmt.Sprintf("%s/api/catalogo_detail/%s", a.apigeeBaseURL, req.CatalogName)
-	
+
 	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, url, nil)
 	if err != nil {
 		return nil, err
@@ -166,7 +166,7 @@ func (a *LegacyCatalogActivity) FetchLegacyCatalogActivity(ctx context.Context, 
 	if err := json.NewDecoder(resp.Body).Decode(&upstreamItems); err != nil {
 		return nil, temporalError("UpstreamDecodeError", err.Error())
 	}
-	
+
 	// Handle "Sin resultados" format transparently
 	if len(upstreamItems) == 0 || (len(upstreamItems) > 0 && upstreamItems[0].CodRespuesta != nil) {
 		return []model.NoResultsCatalogItem{{CodRespuesta: 3, Mensaje: "Sin resultados.", Excepcion: "Ninguna"}}, nil
@@ -188,4 +188,3 @@ func (a *LegacyCatalogActivity) FetchLegacyCatalogActivity(ctx context.Context, 
 func temporalError(errType, message string) error {
 	return fmt.Errorf("%s: %s", errType, message)
 }
-

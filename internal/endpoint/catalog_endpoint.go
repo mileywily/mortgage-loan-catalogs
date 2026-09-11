@@ -3,9 +3,9 @@ package endpoint
 import (
 	"context"
 
-	"github.com/go-kit/kit/endpoint"
 	"github.com/bancofalabella/mortgage-loan-catalogs/internal/model"
 	"github.com/bancofalabella/mortgage-loan-catalogs/internal/service"
+	"github.com/go-kit/kit/endpoint"
 )
 
 // GetCatalogRequestDTO is the input for the endpoint layer.
@@ -27,7 +27,7 @@ type GetCatalogResponseDTO struct {
 func MakeGetCatalogEndpoint(s service.CatalogService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(GetCatalogRequestDTO)
-		
+
 		// Map DTO to pure Domain Model
 		modelReq := model.GetCatalogRequest{
 			CatalogName:   req.CatalogName,
@@ -44,4 +44,3 @@ func MakeGetCatalogEndpoint(s service.CatalogService) endpoint.Endpoint {
 		return GetCatalogResponseDTO{Data: result}, nil
 	}
 }
-

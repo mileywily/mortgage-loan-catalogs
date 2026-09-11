@@ -14,7 +14,7 @@ func TestDecodeGetCatalogRequest_Success(t *testing.T) {
 	req.Header.Set("X-Channel", "WEB")
 	req.Header.Set("X-Commerce", "FALABELLA")
 	req.Header.Set("X-Transaction-ID", "123")
-	
+
 	// Simular el PathValue que inyecta Go 1.22 ServeMux
 	req.SetPathValue("catalog", "Destino")
 
@@ -43,5 +43,3 @@ func TestDecodeGetCatalogRequest_MissingHeaders(t *testing.T) {
 		t.Fatalf("esperado ErrMissingHeaders, obtenido %v", err)
 	}
 }
-
-

@@ -57,7 +57,7 @@ func main() {
 			w.Write([]byte(`[{"codigo_adm":"13101","descripcion":"Santiago Centro","region_id":13}]`))
 			return
 		}
-		
+
 		if catalog == "Regiones" {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(`[{"codigo_adm":"13","descripcion":"Metropolitana de Santiago"}]`))
@@ -69,7 +69,7 @@ func main() {
 			w.Write([]byte(`[]`))
 			return
 		}
-		
+
 		if catalog == "SinResultados" {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(`[{"codRespuesta":3,"Mensaje":"Sin resultados.","Excepcion":"Ninguna"}]`))

@@ -43,4 +43,3 @@ func GetCatalogWorkflow(ctx workflow.Context, req model.GetCatalogRequest) (inte
 
 	return result, nil
 }
-

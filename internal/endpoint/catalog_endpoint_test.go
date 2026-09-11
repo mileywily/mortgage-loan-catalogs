@@ -8,7 +8,7 @@ import (
 	"github.com/bancofalabella/mortgage-loan-catalogs/internal/model"
 )
 
-// MockCatalogService acts as a dummy implementation of the Service Use Case 
+// MockCatalogService acts as a dummy implementation of the Service Use Case
 // for local testing of the Endpoint layer without Temporal or external dependencies.
 type MockCatalogService struct {
 	MockGetCatalog func(ctx context.Context, req model.GetCatalogRequest) (interface{}, error)
@@ -29,7 +29,7 @@ func TestMakeGetCatalogEndpoint_Success(t *testing.T) {
 			if req.CatalogName != "Destino" {
 				t.Errorf("expected catalog name 'Destino', got %s", req.CatalogName)
 			}
-			
+
 			// Dummy return data (the exact format will be handled by the handler)
 			return []model.CatalogItem{{Code: "1", Description: "Dummy"}}, nil
 		},
@@ -45,7 +45,7 @@ func TestMakeGetCatalogEndpoint_Success(t *testing.T) {
 
 	// 2. Act: Execute the endpoint
 	response, err := endpoint(context.Background(), requestDTO)
-	
+
 	// 3. Assert: Interoperability check
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
@@ -55,7 +55,7 @@ func TestMakeGetCatalogEndpoint_Success(t *testing.T) {
 	if respDTO.Error != "" {
 		t.Fatalf("expected no business error, got %v", respDTO.Error)
 	}
-	
+
 	if respDTO.Data == nil {
 		t.Fatalf("expected data in response")
 	}
@@ -82,4 +82,3 @@ func TestMakeGetCatalogEndpoint_Error(t *testing.T) {
 		t.Errorf("expected error %v, got %v", "CatalogNotFoundError: invalid catalog", err)
 	}
 }
-

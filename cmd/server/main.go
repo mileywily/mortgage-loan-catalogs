@@ -151,7 +151,7 @@ func main() {
 
 	// 4. Configurar el Mux (Enrutador) para coincidir exactamente con el legado
 	mux := http.NewServeMux()
-	
+
 	// 4. Configurar el Mux (Enrutador)
 	mux.Handle("POST /v1/bfcl/mortgage-loan/catalogs/{catalog}", httpHandler)
 
@@ -169,4 +169,3 @@ func main() {
 	fmt.Printf("Servidor Mock iniciado en puerto %s. Listo para pruebas en Postman...\n", port)
 	log.Fatal(http.ListenAndServe(":"+port, mux))
 }
-

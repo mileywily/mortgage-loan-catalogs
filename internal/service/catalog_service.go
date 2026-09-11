@@ -11,4 +11,3 @@ import (
 type CatalogService interface {
 	GetCatalog(ctx context.Context, req model.GetCatalogRequest) (interface{}, error)
 }
-

@@ -88,7 +88,7 @@ func DecodeGetCatalogRequest(_ context.Context, r *http.Request) (interface{}, e
 // It explicitly unwraps the Endpoint response to ensure Drop-in replacement (returning a JSON array directly).
 func EncodeResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
 	w.Header().Set("Content-Type", "application/json")
-	
+
 	if res, ok := response.(endpoint.GetCatalogResponseDTO); ok {
 		// Map Pure Domain Entities to DTOs (which contain the correct legacy json tags)
 		switch data := res.Data.(type) {
@@ -171,13 +171,13 @@ type errorResponseDTO struct {
 // translating them strictly to the legacy Java HTTP status codes and payloads.
 func EncodeError(_ context.Context, err error, w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	
+
 	errMessage := err.Error()
 
 	// 1. Unauthorized / Token Error -> Match TokenNotValidException
 	if errors.Is(err, ErrMissingHeaders) || strings.Contains(errMessage, "AuthenticationError") {
 		w.WriteHeader(http.StatusUnauthorized)
-		
+
 		tokenMessage := struct {
 			TokenClass string `json:"token_class"`
 			TokenType  string `json:"token_type"`
@@ -187,7 +187,7 @@ func EncodeError(_ context.Context, err error, w http.ResponseWriter) {
 			TokenType:  "access",
 			Message:    "Token is invalid",
 		}
-		
+
 		d := "Given token not valid for any token type"
 		c := "token_not_valid"
 		json.NewEncoder(w).Encode(errorResponseDTO{
@@ -221,4 +221,3 @@ func EncodeError(_ context.Context, err error, w http.ResponseWriter) {
 		ErrorsDetail: &errMessage,
 	})
 }
-
