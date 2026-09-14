@@ -14,10 +14,14 @@ Para asegurar alta cohesión y bajo acoplamiento, se reemplazó la estructura MV
 *   **Activities / Anti-Corruption Layer (`internal/activities`):** Aquí reside `LegacyCatalogActivity`. Actúa como capa anticorrupción para encapsular todas las deudas técnicas del sistema heredado (Finnflow), parseando respuestas extrañas (ej. `[{"codRespuesta": 3}]`) en entidades puras de Go (`CatalogItem`).
 
 ## 3. Manejo de Deuda Técnica y Paridad Estricta
-Bajo el principio de **Drop-In Replacement**, se violó deliberadamente el principio *Open/Closed (OCP)* en la capa de actividades para calcar el comportamiento "hardcodeado" de Java frente a catálogos especiales:
-1.  **Seguros:** Se mantuvo la validación `HasPrefix(ToLower("seguros"))` para mapear el DTO especializado (`Factor`, `Tasa`).
-2.  **Case Sensitivity:** Se replicó el matching estricto `== "TiposDocumentos"`. Si un cliente envía el path en minúsculas, cae sistemáticamente al ruteo genérico que recorta los `ids` nativos, emulando la omisión de `String.equals()` de Java.
-3.  **JSON Key Ordering:** Se forzó el orden de llaves del serializador Jackson (Java) mediante el uso de *anonymous structs* en Go para el manejo del error `401 Unauthorized` (Messages Array).
+Bajo el principio de **Drop-In Replacement**, se mantuvo la paridad exacta con el comportamiento del motor Jackson (Java) mediante adaptaciones de bajo nivel:
+1.  **Tipado Dinámico Tolerante (Capa Anticorrupción):** Se configuraron los DTOs intermedios con `interface{}` para el campo `codigo_adm`. Esto previene crashes por tipado estricto cuando Apigee (upstream) retorna números (`1`) en lugar de textos (`"1"`), emulando la auto-coerción silenciosa que hacía Java.
+2.  **Notación Científica Emulada:** Se implementó un tipo especial (`json.Number`) con formateo manual para las llaves `Factor` y `Tasa` de los Seguros, forzando a Go a omitir ceros iniciales en el exponente (ej. `2.255E-4`) exactamente como lo hacía `Double.toString()` en Java.
+3.  **Permisividad de Cabeceras:** Aunque Go captura proactivamente los headers corporativos (`X-Transaction-ID`, etc.) para trazabilidad, no rompe la petición (HTTP 200 OK) si el Front-End no los envía, respetando la validación laxa del antiguo `@RestController` de Java.
+4.  **Seguros y Case Sensitivity:** Se mantuvo la validación `HasPrefix(ToLower("seguros"))` y el matching estricto `== "TiposDocumentos"`. Si un cliente envía el path en minúsculas, cae al ruteo genérico.
+
+## 3.1 Single-File Deployment (Swagger Embebido)
+Para optimizar la entrega del artefacto sin dependencias externas, se utilizó la directiva `//go:embed` de Go 1.16+. Toda la interfaz de **Swagger UI** y el archivo `openapi.yaml` residen dentro de la memoria del archivo `.exe`. El equipo de QA y Operaciones ya no necesita copiar carpetas accesorias; basta con ejecutar el binario y visitar `/docs/`.
 
 ## 4. Observabilidad y Trazabilidad (JSON Logging)
 Se configuró la librería nativa `log/slog` de Go 1.21+ para emular el comportamiento del appender `logback-json-classic` del legado.
