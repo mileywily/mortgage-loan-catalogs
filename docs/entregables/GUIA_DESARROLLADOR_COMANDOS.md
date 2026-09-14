@@ -32,17 +32,42 @@ powershell -ExecutionPolicy Bypass -File .\test_paridad_extendido.ps1
 
 ---
 
-## 2. Gestión de Contenedores (Docker)
+## 2. Desarrollo y Compilación Local (Cross-Compilation)
+Gracias a la directiva `go:embed`, el Swagger UI se inyecta directamente en el archivo compilado. No necesitas instalar Docker para generar artefactos listos para QA/Producción.
+
+### 2.1 Ejecutar en Vivo
+```powershell
+go run ./cmd/server/main.go
+```
+
+### 2.2 Compilación Cruzada (Generar ejecutables para cualquier OS)
+```powershell
+# Compilar para Windows
+$env:GOOS="windows"; $env:GOARCH="amd64"
+go build -o api-catalogos.exe ./cmd/server/main.go
+
+# Compilar para Mac M1/M2/M3 (Apple Silicon)
+$env:GOOS="darwin"; $env:GOARCH="arm64"
+go build -o api-catalogos-mac-arm ./cmd/server/main.go
+
+# Compilar para Servidores Linux
+$env:GOOS="linux"; $env:GOARCH="amd64"
+go build -o api-catalogos-linux ./cmd/server/main.go
+```
+
+---
+
+## 3. Gestión de Contenedores (Docker)
 
 El empaquetado del proyecto utiliza Docker Multi-Stage.
 
-### 2.1 Construir la Imagen (Build)
+### 3.1 Construir la Imagen (Build)
 Empaqueta el binario estático y la documentación de Swagger en una imagen ultraligera de Alpine.
 ```powershell
 docker build -t gcr.io/tu-proyecto/mortgage-loan-catalogs:latest .
 ```
 
-### 2.2 Levantar el Ecosistema Localmente (Run)
+### 3.2 Levantar el Ecosistema Localmente (Run)
 Para emular el entorno de Producción, primero debemos levantar el *Mock Backend* (que simula a Apigee/Finnflow) y luego el microservicio conectándolo a dicho Mock.
 
 ```powershell
@@ -62,7 +87,7 @@ docker run -d `
   gcr.io/tu-proyecto/mortgage-loan-catalogs:latest
 ```
 
-### 2.3 Detener y Borrar el Contenedor
+### 3.3 Detener y Borrar el Contenedor
 ```powershell
 # Forzar el borrado del contenedor activo
 docker rm -f catalogos-go
@@ -73,11 +98,11 @@ docker images | Select-String "mortgage-loan-catalogs"
 
 ---
 
-## 3. Observabilidad y Trazabilidad (Logs JSON)
+## 4. Observabilidad y Trazabilidad (Logs JSON)
 
 El microservicio utiliza `log/slog` para escupir logs 100% compatibles con Splunk/Datadog. Cada petición atrapa el `X-Transaction-ID` del cliente.
 
-### 3.1 Disparar una petición de prueba
+### 4.1 Disparar una petición de prueba
 Envía una petición HTTP POST usando PowerShell, inyectando cabeceras de trazabilidad corporativa:
 ```powershell
 Invoke-WebRequest -Method Post `
@@ -90,7 +115,7 @@ Invoke-WebRequest -Method Post `
   } | Select-Object StatusCode, Content
 ```
 
-### 3.2 Visualizar la Observabilidad en Vivo
+### 4.2 Visualizar la Observabilidad en Vivo
 Para ver la reacción del contenedor y extraer el JSON estructurado (donde verás tu `"transactionId":"TRACE-LOCAL-999"` y el tiempo de respuesta):
 ```powershell
 # Ver los últimos logs y quedarse escuchando (-f o follow)

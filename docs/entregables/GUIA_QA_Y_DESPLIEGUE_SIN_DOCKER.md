@@ -8,8 +8,9 @@ Este documento detalla el paso a paso para el equipo de Infraestructura, DevOps 
 ## 1. Despliegue para Pruebas de Integración Reales (Staging / QA)
 Si el objetivo es colocar el código en un servidor de pruebas para que interactúe con el **Apigee/Finnflow Real** de su entorno de QA, sigan estos pasos:
 
-### 1.1 Obtener el Binario Compilado
-El desarrollador debe proveer el archivo ejecutable compilado nativamente para el sistema operativo del servidor (ej. `api-catalogos-linux` o `api-catalogos.exe`). Al estar hecho en Go, **no necesitan instalar Java (JRE) ni ninguna otra dependencia** en el servidor.
+### 1.1 Obtener el Binario Compilado (Single-File Deployment)
+El desarrollador debe proveer **únicamente** el archivo ejecutable compilado nativamente para el sistema operativo del servidor (ej. `api-catalogos-linux` o `api-catalogos.exe`). Al estar hecho en Go, **no necesitan instalar Java (JRE) ni ninguna otra dependencia** en el servidor. 
+*Nota Mágica:* Gracias a la directiva `go:embed`, toda la interfaz gráfica de **Swagger UI** está inyectada dentro de la memoria del propio ejecutable. ¡No necesitan copiar carpetas `docs` ni archivos anexos!
 
 ### 1.2 Configurar Variables de Entorno en el Servidor
 Configuren las siguientes variables de entorno en su servidor apuntando a las credenciales y URLs reales del sistema de pruebas:
